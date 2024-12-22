@@ -62,7 +62,7 @@ else
     echo "Running on CI"
 fi
 
-IMAGE_NAME=caprover/goacess
+IMAGE_NAME=caprover/goaccess
 
 # BRANCH=$(git rev-parse --abbrev-ref HEAD)
 # On Github the line above does not work, instead:
