@@ -23,7 +23,41 @@ else
     exit 1
 fi
 
-echo $goaccess_version
+replaceVariablesInDockerfile() {
+    local variables_string="$1" # Comma-separated list of variables
+    local file="Dockerfile.goaccess"
+
+    # Check if the variables string is provided
+    if [ -z "$variables_string" ]; then
+        echo "Error: Variables string must be provided."
+        echo "Usage: replace_variables \"var1,var2\""
+        return 1
+    fi
+
+    # Backup the original Dockerfile.prod
+    cp "$file" "${file}.bak"
+
+    # Split the variables string into an array
+    IFS=',' read -r -a variables <<<"$variables_string"
+
+    # Iterate over the variables and replace placeholders
+    for var in "${variables[@]}"; do
+        local value
+        value="${!var}"
+
+        if [ -z "$value" ]; then
+            echo "Error: Environment variable $var is not set."
+            return 1
+        fi
+
+        sed -i "s/\$$var/$value/g" "$file"
+    done
+
+    echo "Replacement complete. Original file backed up as ${file}.bak."
+}
+
+replaceVariablesInDockerfile goaccess_version
+
 exit 0
 
 # ensure you're not running it on local machine
