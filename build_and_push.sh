@@ -64,11 +64,6 @@ fi
 
 IMAGE_NAME=caprover/goacess
 
-if [ ! -f ./package-lock.json ]; then
-    echo "package-lock.json not found!"
-    exit 1
-fi
-
 # BRANCH=$(git rev-parse --abbrev-ref HEAD)
 # On Github the line above does not work, instead:
 BRANCH=${GITHUB_REF##*/}
@@ -77,9 +72,6 @@ if [[ "$BRANCH" != "release" ]]; then
     echo 'Not on release branch! Aborting script!'
     exit 1
 fi
-
-## Building frontend app
-ORIG_DIR=$(pwd)
 
 sudo apt-get update && sudo apt-get install qemu-user-static
 # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
