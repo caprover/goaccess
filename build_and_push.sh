@@ -83,4 +83,5 @@ docker buildx create --name mybuilder
 docker buildx use mybuilder
 
 # docker buildx build --platform linux/arm -t $IMAGE_NAME:$CAPROVER_VERSION -t $IMAGE_NAME:latest  -f dockerfile-captain.edge --push .
-docker buildx build --platform linux/amd64,linux/arm64,linux/arm -t $IMAGE_NAME:$goaccess_version -t $IMAGE_NAME:latest -f Dockerfile.goaccess --push .
+docker buildx build --platform linux/amd64,linux/arm64 -t $IMAGE_NAME:$goaccess_version -t $IMAGE_NAME:latest -f Dockerfile.goaccess --push .
+# ,linux/arm is not available for allinurl/goaccess
