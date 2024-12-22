@@ -34,9 +34,6 @@ replaceVariablesInDockerfile() {
         return 1
     fi
 
-    # Backup the original Dockerfile.prod
-    cp "$file" "${file}.bak"
-
     # Split the variables string into an array
     IFS=',' read -r -a variables <<<"$variables_string"
 
@@ -53,12 +50,9 @@ replaceVariablesInDockerfile() {
         sed -i "s/\$$var/$value/g" "$file"
     done
 
-    echo "Replacement complete. Original file backed up as ${file}.bak."
 }
 
 replaceVariablesInDockerfile goaccess_version
-
-exit 0
 
 # ensure you're not running it on local machine
 if [ -z "$CI" ] || [ -z "$GITHUB_REF" ]; then
@@ -97,8 +91,4 @@ docker buildx create --name mybuilder
 docker buildx use mybuilder
 
 # docker buildx build --platform linux/arm -t $IMAGE_NAME:$CAPROVER_VERSION -t $IMAGE_NAME:latest  -f dockerfile-captain.edge --push .
-docker buildx build --platform linux/amd64,linux/arm64,linux/arm -t $IMAGE_NAME:$CAPROVER_VERSION -t $IMAGE_NAME:latest -f Dockerfile.goaccess --push .
-
-# docker build -t $IMAGE_NAME:$CAPROVER_VERSION -t $IMAGE_NAME:latest  -f dockerfile-captain.edge .
-# docker push $IMAGE_NAME:latest
-# docker push $IMAGE_NAME:$CAPROVER_VERSION
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm -t $IMAGE_NAME:$goaccess_version -t $IMAGE_NAME:latest -f Dockerfile.goaccess --push .
