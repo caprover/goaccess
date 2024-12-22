@@ -1,0 +1,17 @@
+FROM allinurl/goaccess:$goaccess_version
+
+
+RUN which crond && \
+    rm -rf /etc/periodic
+
+COPY ./goaccess-files/entrypoint.sh /entrypoint.sh
+COPY ./goaccess-files/catchupLog.sh /catchupLog.sh
+COPY ./goaccess-files/processLogs.sh /processLogs.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+# https://blog.thesparktree.com/cron-in-docker
+# source: `docker run --rm -it alpine  crond -h`
+# -f | Foreground
+# -l N | Set log level. Most verbose 0, default 8
+CMD ["crond", "-f", "-l", "2"]
