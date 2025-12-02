@@ -45,6 +45,7 @@ for logFile in /var/log/nginx-shared/$FILE_PREFIX*access.log; do
     if [ -d "$dbPath" ] && [ -f "$appPath/.anonymize-ip" ]; then
       echo "Anonymization disabled but database was created with anonymization, removing to recreate"
       rm -rf "$dbPath"
+      rm "$appPath/.anonymize-ip"
       mkdir -p "$dbPath"
     fi
     
