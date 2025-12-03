@@ -47,7 +47,13 @@ for logFile in /var/log/nginx-shared/*.log; do
       # Remove the GoAccess cache db files for the catchup processing now that the log is reset
       rm -rf $dbPath
 
-      goaccess $rotatedLog -a -o "$report" --log-format=COMBINED
+      # Build goaccess command with optional anonymize-ip flag
+      if [ "$ANONYMIZE_IP" = "true" ]; then
+        echo "Anonymizing IP addresses for $report"
+        goaccess "$rotatedLog" -a -o "$report" --log-format=COMBINED --anonymize-ip
+      else
+        goaccess "$rotatedLog" -a -o "$report" --log-format=COMBINED
+      fi
 
       gzip $rotatedLog
     fi

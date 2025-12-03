@@ -26,7 +26,30 @@ for logFile in /var/log/nginx-shared/$FILE_PREFIX*access.log; do
 
   echo "Processing catchup $report"
 
-  goaccess $logFile -a -o "$report" --log-format=COMBINED --restore --persist --db-path $dbPath
-
+  # If anonymization is enabled, check if database exists and was created without anonymization
+  # If so, delete it to ensure it's recreated with anonymization
+  if [ "$ANONYMIZE_IP" = "true" ]; then
+    # Check if database exists and doesn't have anonymization marker
+    if [ -d "$dbPath" ] && [ ! -f "$appPath/.anonymize-ip" ]; then
+      echo "Database exists without anonymization, removing to recreate with anonymization"
+      rm -rf "$dbPath"
+      mkdir -p "$dbPath"
+    fi
+    # Create marker file to indicate database was created with anonymization
+    touch "$appPath/.anonymize-ip"
+    
+    echo "Anonymizing IP addresses for $report"
+    goaccess "$logFile" -a -o "$report" --log-format=COMBINED --restore --persist --db-path "$dbPath" --anonymize-ip
+  else
+    # If anonymization is disabled but database has anonymization marker, remove it
+    if [ -d "$dbPath" ] && [ -f "$appPath/.anonymize-ip" ]; then
+      echo "Anonymization disabled but database was created with anonymization, removing to recreate"
+      rm -rf "$dbPath"
+      rm "$appPath/.anonymize-ip"
+      mkdir -p "$dbPath"
+    fi
+    
+    goaccess "$logFile" -a -o "$report" --log-format=COMBINED --restore --persist --db-path "$dbPath"
+  fi
 
 done
